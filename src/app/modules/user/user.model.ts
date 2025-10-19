@@ -7,6 +7,7 @@ const userSchema = new Schema<IUser>({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
+    credit: { type: Number, default: 0 },
     referralCode: { type: String, required: true, unique: true },
     referredBy: { type: Schema.Types.ObjectId, ref: "User", default: null },
     role: { type: String, enum: ["USER"], default: "USER" },

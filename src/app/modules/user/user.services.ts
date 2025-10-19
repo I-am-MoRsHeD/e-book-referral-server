@@ -12,13 +12,13 @@ const generateReferralCode = (name: string = "R"): string => {
 };
 
 const createUser = async (payload: Partial<IUser>, query?: Record<string, string>) => {
-
-    const isUserExist = await User.findOne({ email: payload.email });
+    const { email, password, ...rest } = payload;
+    const isUserExist = await User.findOne({ email: email });
     if (isUserExist) {
         throw new Error('User already exists');
     };
 
-    const hashedPassword = await bcrypt.hash(payload?.password as string, envVars.BCRYPT_SALT_ROUNDS);
+    const hashedPassword = await bcrypt.hash(password as string, envVars.BCRYPT_SALT_ROUNDS);
 
     let referredBy = null;
 
@@ -35,10 +35,11 @@ const createUser = async (payload: Partial<IUser>, query?: Record<string, string
 
     const userPayload = {
         password: hashedPassword,
-        ...payload,
+        email,
         referralCode,
         referredBy: referredBy?._id,
-        role: "USER"
+        role: "USER",
+        ...rest,
     };
 
     const user = await User.create(userPayload);

@@ -7,6 +7,7 @@ export interface IUser {
     name: string;
     email: string;
     password: string;
+    credit: number;
     referralCode: string;
     referredBy?: Types.ObjectId;
     role: "USER";
