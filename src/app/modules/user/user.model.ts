@@ -1,5 +1,6 @@
 import { model, Schema } from "mongoose";
 import { IUser } from "./user.interface";
+import { Referral } from "../referral/referral.model";
 
 
 const userSchema = new Schema<IUser>({
@@ -13,5 +14,19 @@ const userSchema = new Schema<IUser>({
     timestamps: true,
     versionKey: false,
 });
+
+
+userSchema.post('save', async function (doc) {
+    if (doc.referredBy) {
+        const referalPayload = {
+            referrerUser: doc.referredBy,
+            referredUser: doc._id
+        };
+
+        await Referral.create(referalPayload);
+
+    };
+});
+
 
 export const User = model<IUser>("User", userSchema);
