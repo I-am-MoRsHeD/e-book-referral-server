@@ -5,6 +5,7 @@ import AppError from "../../errorHelpers/AppError";
 import { Purchase } from "./purchase.model";
 import { Referral } from "../referral/referral.model";
 import { ReferralStatus } from "../referral/referral.interface";
+import { Types } from "mongoose";
 
 
 const purchaseBook = async (payload: IPurchase, decodedUser: JwtPayload) => {
@@ -23,21 +24,30 @@ const purchaseBook = async (payload: IPurchase, decodedUser: JwtPayload) => {
             const referralStatus = await Referral.findOne({ referredUser: decodedUser?.userId });
 
             if (referralStatus?.status === ReferralStatus.PENDING) {
-                const referredUser = await User.findById({ _id: isUserExist?.referredBy })
+                const referrer = await User.findById({ _id: isUserExist?.referredBy })
 
-                if (referredUser) {
-                    referredUser.credit = Number(referredUser?.credit) + 2
-                    await referredUser.save();
+                if (referrer) {
+                    const payload = referrer?.credit + 2;
+                    await User.findByIdAndUpdate(referrer?._id, {
+                        credit: payload
+                    }, {
+                        new: true, runValidators: true, session
+                    });
                 };
 
-                isUserExist.credit = isUserExist.credit + 2;
-                await isUserExist.save();
-
-
-                await Referral.updateOne({ _id: referralStatus?._id }, {
-                    status: ReferralStatus.CONVERTED
+                const payload = isUserExist?.credit + 2;
+                await User.findByIdAndUpdate(isUserExist?._id, {
+                    credit: payload
                 }, {
-                    runValidators: true, session
+                    new: true, runValidators: true, session
+                })
+
+
+                await Referral.findByIdAndUpdate(referralStatus?._id,
+                    {
+                        status: ReferralStatus.CONVERTED
+                    }, {
+                    new: true, runValidators: true, session
                 });
             };
 
