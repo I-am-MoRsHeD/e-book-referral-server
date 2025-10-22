@@ -16,7 +16,21 @@ const createUser = catchAsync(async (req: Request, res: Response, next: NextFunc
     });
 });
 
+const getMe = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const decodedToken = req.user;
+
+    const result = await UserService.getMe(decodedToken);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: 200,
+        message: "Your profile retrieved successfully",
+        data: result
+    })
+})
+
 
 export const UserController = {
     createUser,
+    getMe
 };

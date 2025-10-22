@@ -1,3 +1,4 @@
+import { JwtPayload } from "jsonwebtoken";
 import { envVars } from "../../config/env";
 import AppError from "../../errorHelpers/AppError";
 import { IUser } from "./user.interface";
@@ -47,6 +48,17 @@ const createUser = async (payload: Partial<IUser>, query?: Record<string, string
     return user;
 };
 
+const getMe = async (decodedUser: JwtPayload) => {
+    const isUserExist = await User.findById(decodedUser?.userId).select("-password");
+
+    if (!isUserExist) {
+        throw new AppError(400, 'User does not exist');
+    };
+
+    return isUserExist;
+}
+
 export const UserService = {
     createUser,
+    getMe
 };

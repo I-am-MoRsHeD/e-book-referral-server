@@ -14,16 +14,7 @@ const getReferralOverview = async (decodedUser: JwtPayload) => {
     const totalReferredUsers = await Referral.countDocuments({
         referrerUser: userId
     });
-    // const totalReferredUsers = await Referral.find({ referrerUser: userId });
 
-    // const totalPurchasedUsers = await Referral.aggregate([
-    //     {
-    //         $match : {
-    //             referrerUser : userId,
-    //             status : ReferralStatus.CONVERTED
-    //         }
-    //     }
-    // ]);
     const totalPurchasedUsers = await Referral.countDocuments({
         referrerUser: userId,
         status: ReferralStatus.CONVERTED
